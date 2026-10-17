@@ -12,12 +12,12 @@ This is an independent, non-commercial awareness project, for information only. 
 
 Each country visited earns points for the door the traveller's passport meets there. The more paperwork a door needs, the more points it earns, so a higher score means more effort went into the journey.
 
-| Door | What it means | Points |
+| Door (entry requirement) | What it means | Points |
 |---|---|---:|
-| Open door | Visa free, or freedom of movement | 1 |
-| Quick formality | Visa on arrival, or an electronic travel authorisation (eTA) | 2 |
-| Online visa | An e-Visa, applied for and approved before travel | 3 |
-| Embassy visa | A visa applied for through an embassy, consulate or visa centre | 6 |
+| Visa free | No visa needed, including freedom of movement | 1 |
+| Visa on arrival or eTA | A visa given at the border, or a quick online travel authorisation | 2 |
+| e-Visa | An electronic visa, applied for and approved before travel | 3 |
+| Visa required | A visa applied for through an embassy, consulate or visa centre before travel | 6 |
 
 The site also shows how many of 198 countries each passport can enter without a prior visa, and the passport's official rank in the Henley Passport Index.
 
