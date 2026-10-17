@@ -1,0 +1,4 @@
+{
+  "_comment": "Manual fixes applied after each data refresh, for confirmed policy changes the sources have not caught up with. One entry per passport and destination. type is one of: visa-free, freedom-of-movement, visa-on-arrival, eta, e-visa, visa-required, refused. Always record the official source and the date the rule took effect.",
+  "corrections": []
+}

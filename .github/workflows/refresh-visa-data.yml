@@ -1,0 +1,44 @@
+name: Refresh visa data
+
+# Rebuilds the visa rules from Wikipedia and Passport Index once a month and
+# opens a pull request with any changes, so every update gets a human look
+# before it goes live.
+on:
+  schedule:
+    - cron: "17 5 3 * *"   # 05:17 UTC on the 3rd of each month
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Rebuild visa-matrix from Wikipedia and Passport Index
+        run: |
+          git clone --depth 1 https://github.com/xpressmike/visa-matrix.git upstream
+          cd upstream
+          python3 build.py
+
+      - name: Convert to the format the site reads
+        run: python3 tools/build_visa.py upstream/data/visa-matrix.json
+
+      - name: Open a pull request if the data changed
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "Monthly visa data refresh"
+          title: "Monthly visa data refresh"
+          body: |
+            Automatic rebuild of data/visa.json from Wikipedia and Passport Index.
+            Check a few changed countries against official sources before merging.
+          branch: auto/visa-refresh
+          add-paths: data/visa.json
+          delete-branch: true

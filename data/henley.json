@@ -1,0 +1,7 @@
+{
+  "_comment": "Official ranks from the Henley Passport Index (Henley & Partners, based on IATA data). Entered by hand from the published ranking each quarter; never collected automatically, because Henley's terms of use do not allow it. ranks maps an ISO 3166-1 alpha-2 code to [rank, number of destinations reachable without a prior visa]. Leave a passport out if its figure is not confirmed.",
+  "edition": "October 2026",
+  "published": "2026-10-09",
+  "destinations": 227,
+  "ranks": {}
+}
