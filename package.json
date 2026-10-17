@@ -3,12 +3,14 @@
   "private": true,
   "description": "Tools for rebuilding the map file. The site itself needs no build step.",
   "scripts": {
-    "build:map": "node tools/build_map.js"
+    "build:map": "node tools/build_map.js ne_50m_admin_0_breakaway_disputed_areas.geojson ne_10m_admin_0_disputed_areas.geojson"
   },
   "devDependencies": {
     "d3-geo": "3.1.1",
     "i18n-iso-countries": "7.14.0",
+    "polygon-clipping": "0.15.7",
     "topojson-client": "3.1.0",
+    "topojson-server": "3.0.1",
     "topojson-simplify": "3.0.3",
     "world-atlas": "2.0.2"
   }

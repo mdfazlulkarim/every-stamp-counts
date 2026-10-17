@@ -6,7 +6,7 @@ Some passports open most of the world without paperwork. Others need a visa appl
 
 Live site: https://mdfazlulkarim.github.io/every-stamp-counts/
 
-This is an independent, non-commercial awareness project. Visa rules change often, so always confirm with the destination's authorities before you travel.
+This is an independent, non-commercial awareness project. It is not a United Nations product and is not endorsed by the United Nations. Visa rules change often, so always confirm with the destination's authorities before you travel.
 
 ## How the score works
 
@@ -29,9 +29,10 @@ The site also shows how many of 198 countries each passport can enter without a 
 | `data/visa.json` | Entry rules for every passport and destination, in a compact format |
 | `data/henley.json` | Official Henley Passport Index ranks, entered by hand |
 | `data/corrections.json` | Manual fixes for rule changes the sources have not caught up with |
-| `data/world.json` | The world map |
+| `data/world.json` | The world map, drawn to follow United Nations map conventions |
+| `flags/` | Country flags from flag-icons |
 | `tools/build_visa.py` | Converts the visa-matrix dataset into `data/visa.json` |
-| `tools/build_map.js` | Rebuilds `data/world.json` (one-off) |
+| `tools/build_map.js` | Rebuilds `data/world.json` from Natural Earth (one-off; see the notes at the top of the script) |
 | `.github/workflows/refresh-visa-data.yml` | Monthly refresh of the visa rules |
 
 ## Keeping the data current
@@ -61,4 +62,4 @@ Then open http://localhost:8000. The page loads its data with `fetch`, so openin
 
 ## Licences
 
-Code: MIT (see `LICENSE`). Data: see `DATA-LICENSE.md`. The visa data is CC BY-SA 4.0, credited to visa-matrix, Wikipedia contributors and Passport Index. Henley Passport Index figures are © Henley & Partners and are used with attribution on a non-commercial site. The boundaries and names shown on the map do not imply official endorsement or acceptance.
+Code: MIT (see `LICENSE`). Data and flags: see `DATA-LICENSE.md`. The visa data is CC BY-SA 4.0, credited to visa-matrix, Wikipedia contributors and Passport Index. Henley Passport Index figures are © Henley & Partners and are used with attribution on a non-commercial site. The boundaries and names shown on the map do not imply official endorsement or acceptance.
