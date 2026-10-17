@@ -615,7 +615,7 @@ footer { padding-block: 24px 36px; }
     } catch (e) { /* ignore */ }
     Object.assign(state, { p: EXAMPLE.p, v: EXAMPLE.v.slice(), c: null, example: true });
   }
-  const defaultCompare = () => (reach[state.p] >= reach[picks.middle] ? picks.least : picks.most);
+  const defaultCompare = () => (picks.power(state.p) >= picks.power(picks.middle) ? picks.least : picks.most);
 
   /* ---------- Theme ---------- */
   function currentTheme() {
@@ -993,8 +993,11 @@ footer { padding-block: 24px 36px; }
     [V, WORLD, HENLEY] = await Promise.all([get("data/visa.json"), get("data/world.json"), get("data/henley.json")]);
     V.codes.forEach((c, i) => { idx[c] = i; nameOf[c] = V.names[i]; });
     for (const p in V.doors) { let n = 0; for (const ch of V.doors[p]) if ("FMAT".includes(ch)) n++; reach[p] = n; }
-    const ranked = Object.keys(reach).sort((a, b) => reach[b] - reach[a] || nameOf[a].localeCompare(nameOf[b]));
-    picks = { most: ranked[0], middle: ranked[Math.floor(ranked.length / 2)], least: ranked[ranked.length - 1] };
+    // The swap shortcuts follow the official Henley ranking when it is loaded.
+    const H = HENLEY.ranks || {};
+    const power = (p) => (H[p] ? H[p][1] : reach[p]);
+    const ranked = Object.keys(reach).sort((a, b) => power(b) - power(a) || nameOf[a].localeCompare(nameOf[b]));
+    picks = { most: ranked[0], middle: ranked[Math.floor(ranked.length / 2)], least: ranked[ranked.length - 1], power };
     fillSelects(); describeData(); restore(); buildMap(); setupSearch(); wire(); renderAll();
   }
 
