@@ -6,7 +6,7 @@ Some passports open most of the world without paperwork. Others need a visa appl
 
 Live site: https://mdfazlulkarim.github.io/every-stamp-counts/
 
-This is an independent, non-commercial awareness project. It is not a United Nations product and is not endorsed by the United Nations. Visa rules change often, so always confirm with the destination's authorities before you travel.
+This is an independent, non-commercial awareness project, for information only. It should not be used to plan travel. Visa rules change often, so always confirm with the destination's authorities before you travel.
 
 ## How the score works
 

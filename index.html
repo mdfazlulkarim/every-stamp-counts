@@ -276,7 +276,7 @@ footer { padding-block: 24px 36px; }
 <div class="notice" role="note">
   <div class="wrap">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"></circle><path d="M12 11v6M12 7.5v.01"></path></svg>
-    <span><strong>Independent personal project.</strong> This is not a United Nations product and is not endorsed by the United Nations. Spotted a data discrepancy? <span id="notice-contact">Please let me know.</span></span>
+    <span><strong>For information only.</strong> Please do not use this site to plan travel. <span id="notice-updated"></span> Spotted a data discrepancy? <span id="notice-contact">Please let me know.</span></span>
   </div>
 </div>
 
@@ -969,7 +969,9 @@ footer { padding-block: 24px 36px; }
     for (const p in V.doors) pairs += V.codes.length - 1;
     for (const p in V.disputed) disputed += V.disputed[p].length / 2;
     const share = Math.round((disputed / pairs) * 100);
-    const checked = new Date(V.checked + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+    const longDate = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+    const checked = longDate(V.checked);
+    $("#notice-updated").textContent = `Last updated: visa rules ${checked}, official ranks ${HENLEY.published ? longDate(HENLEY.published) : HENLEY.edition}.`;
     $("#data-score").innerHTML = "Each country you have visited earns points for the door your passport met there, so a higher score means more effort went into the journey: "
       + DOORS.map((d) => `<strong>${d.name}</strong> ${d.pts} (${d.meaning})`).join("; ")
       + ". The Henley Passport Index counts visa free, visa on arrival and eTA access equally. This site separates them, because each extra step costs time and money.";
