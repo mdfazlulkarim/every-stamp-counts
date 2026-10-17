@@ -192,12 +192,25 @@ section { padding-block: 28px; }
 /* Passport page and journey */
 .pair { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 24px; align-items: start; }
 .panel > * + * { margin-top: 16px; }
-.combo { position: relative; }
-.combo ul { position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 6; margin: 0; padding: 4px; list-style: none; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; max-height: 280px; overflow-y: auto; box-shadow: 0 10px 24px rgba(0, 0, 0, .12); }
-.combo li { display: flex; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 6px; cursor: pointer; }
-.combo li[aria-selected="true"] { background: color-mix(in oklab, var(--accent) 16%, var(--bg)); }
-.combo li .door { margin-left: auto; font-size: var(--step--1); color: var(--ink-soft); white-space: nowrap; }
-.combo li.empty { cursor: default; color: var(--ink-soft); }
+.picker { position: relative; }
+.pick-btn { font: inherit; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 10px; padding: 9px 12px; width: 100%; min-width: 0; display: flex; gap: 10px; align-items: center; text-align: left; cursor: pointer; }
+.pick-btn[aria-expanded="true"] { border-color: var(--accent-strong); }
+.pick-value { display: inline-flex; gap: 9px; align-items: center; flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.pick-btn .caret { width: 12px; height: 8px; flex: none; color: var(--ink-soft); }
+.pick-panel { position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 8; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 12px 28px rgba(0, 0, 0, .16); padding: 8px; }
+.pick-search { margin-bottom: 6px; }
+.pick-list { list-style: none; margin: 0; padding: 0; max-height: 300px; overflow-y: auto; }
+.pick-list li { display: flex; gap: 10px; align-items: center; padding: 8px 8px; border-radius: 6px; cursor: pointer; }
+.pick-list li.active { background: color-mix(in oklab, var(--accent) 12%, var(--bg)); }
+.pick-list li[aria-disabled="true"] { cursor: default; color: var(--ink-soft); }
+.pick-list li .door { margin-left: auto; font-size: var(--step--1); color: var(--ink-soft); white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
+.pick-list li .nm { min-width: 0; overflow-wrap: anywhere; }
+.pick-list li.empty { cursor: default; color: var(--ink-soft); }
+.cbx { width: 18px; height: 18px; border: 1.6px solid var(--ink-soft); border-radius: 5px; flex: none; display: inline-grid; place-items: center; background: var(--bg); }
+.pick-list li[aria-selected="true"] .cbx { background: var(--accent-strong); border-color: var(--accent-strong); }
+.pick-list li[aria-selected="true"] .cbx::after { content: ""; width: 9px; height: 5px; border-left: 2px solid var(--accent-ink); border-bottom: 2px solid var(--accent-ink); transform: rotate(-45deg) translate(1px, -1px); }
+.pick-list li.single[aria-selected="true"] { font-weight: 700; }
+.pick-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; border-top: 1px solid var(--line); margin-top: 6px; padding-top: 8px; font-size: var(--step--1); }
 .picks { display: flex; flex-wrap: wrap; gap: 8px; }
 .pick { font: inherit; font-size: var(--step--1); display: inline-flex; gap: 7px; align-items: center; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 999px; padding: 5px 11px 5px 7px; cursor: pointer; }
 .pick[aria-pressed="true"] { border-color: var(--accent-strong); background: color-mix(in oklab, var(--accent) 14%, var(--bg)); font-weight: 700; }
@@ -327,8 +340,14 @@ footer { padding-block: 24px 36px; }
       <div class="pp-row">
         <span id="pp-flag"></span>
         <div>
-          <label class="field-label" for="passport">Your passport</label>
-          <select id="passport"></select>
+<div class="picker" id="passport-picker">
+          <span class="field-label" id="passport-picker-label">Your passport</span>
+          <button type="button" class="pick-btn" id="passport-picker-btn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="passport-picker-label passport-picker-btn"><span class="pick-value"></span><svg class="caret" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5 6 6.5 11 1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <div class="pick-panel" hidden>
+            <input type="search" class="pick-search" placeholder="Search passports" autocomplete="off" aria-label="Search passports">
+            <ul class="pick-list" role="listbox" aria-labelledby="passport-picker-label"></ul>
+          </div>
+        </div>
         </div>
       </div>
       <div>
@@ -374,11 +393,13 @@ footer { padding-block: 24px 36px; }
     <div class="pair">
       <div class="card panel">
         <h2>Your passport page <span class="muted num" id="stamp-count"></span></h2>
-        <div class="combo">
-          <label class="field-label" for="country-search">Add a country</label>
-          <input type="search" id="country-search" placeholder="Type a country name" autocomplete="off"
-                 role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="country-options">
-          <ul id="country-options" role="listbox" hidden></ul>
+<div class="picker" id="country-picker" data-multi="1">
+          <span class="field-label" id="country-picker-label">Countries you have visited</span>
+          <button type="button" class="pick-btn" id="country-picker-btn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="country-picker-label country-picker-btn"><span class="pick-value"></span><svg class="caret" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5 6 6.5 11 1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <div class="pick-panel" hidden>
+            <input type="search" class="pick-search" placeholder="Search countries" autocomplete="off" aria-label="Search countries">
+            <ul class="pick-list" role="listbox" aria-multiselectable="true" aria-labelledby="country-picker-label"></ul>
+          </div>
         </div>
         <div>
           <p class="small muted" style="margin-bottom:8px">Popular stamps</p>
@@ -444,8 +465,14 @@ footer { padding-block: 24px 36px; }
         <p class="muted" style="margin-top:8px">Same trip, different passport. What would it have taken?</p>
         <div class="picks" id="picks" style="margin-top:14px"></div>
         <div style="margin-top:14px">
-          <label class="field-label" for="compare-with">Or choose any passport</label>
-          <select id="compare-with"></select>
+<div class="picker" id="compare-picker">
+          <span class="field-label" id="compare-picker-label">Or choose any passport</span>
+          <button type="button" class="pick-btn" id="compare-picker-btn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="compare-picker-label compare-picker-btn"><span class="pick-value"></span><svg class="caret" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5 6 6.5 11 1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <div class="pick-panel" hidden>
+            <input type="search" class="pick-search" placeholder="Search passports" autocomplete="off" aria-label="Search passports">
+            <ul class="pick-list" role="listbox" aria-labelledby="compare-picker-label"></ul>
+          </div>
+        </div>
         </div>
       </div>
       <div>
@@ -656,7 +683,6 @@ footer { padding-block: 24px 36px; }
 
   /* ---------- Passport card ---------- */
   function renderPassport() {
-    $("#passport").value = state.p;
     $("#pp-flag").innerHTML = flag(state.p, "flag lg");
     const counts = doorCounts(state.p);
     $("#reach-num").textContent = fmt(counts.open + counts.quick);
@@ -881,7 +907,6 @@ footer { padding-block: 24px 36px; }
   /* ---------- Swap ---------- */
   function renderCompare() {
     if (!state.c || state.c === state.p) state.c = defaultCompare();
-    $("#compare-with").value = state.c;
     $("#picks").innerHTML = [["most", "Most open"], ["middle", "Middle of the pack"], ["least", "Least open"]]
       .filter(([k]) => picks[k] !== state.p)
       .map(([k, label]) => `<button type="button" class="pick" data-pick="${picks[k]}" aria-pressed="${picks[k] === state.c}">${flag(picks[k])}${label}: ${esc(nameOf[picks[k]])}</button>`).join("");
@@ -900,7 +925,7 @@ footer { padding-block: 24px 36px; }
   }
 
   /* ---------- Actions ---------- */
-  function renderAll() { renderPassport(); renderCompare(); renderMap(); renderStamps(); renderJourney(); persist(); }
+  function renderAll() { renderPassport(); renderCompare(); renderMap(); renderStamps(); renderJourney(); Object.values(pickers).forEach((p) => p.refresh()); persist(); }
   function toggleCountry(iso) {
     const i = state.v.indexOf(iso);
     if (i >= 0) state.v.splice(i, 1); else { state.v.push(iso); freshCode = iso; }
@@ -914,58 +939,105 @@ footer { padding-block: 24px 36px; }
     renderAll();
   }
 
-  /* ---------- Country search ---------- */
-  function setupSearch() {
-    const input = $("#country-search"), listEl = $("#country-options");
-    const entries = V.codes.map((c, i) => ({ c, name: V.names[i], keys: [V.names[i], ...(V.aliases[c] || [])].map(norm) }));
-    let results = [], active = 0;
-    function find(q) {
-      const n = norm(q);
-      if (!n) return [];
+  /* ---------- Flag dropdowns ---------- */
+  const pickers = {};
+  function makePicker(id, opts) {
+    const root = document.getElementById(id), multi = !!root.dataset.multi;
+    const btn = root.querySelector(".pick-btn"), panel = root.querySelector(".pick-panel");
+    const input = root.querySelector(".pick-search"), list = root.querySelector(".pick-list");
+    let shown = [], active = -1;
+    const entries = () => opts.codes().map((c) => ({ c, name: nameOf[c], keys: [nameOf[c], ...(V.aliases[c] || [])].map(norm) }));
+    function filter(q) {
+      const n = norm(q), all = entries();
+      if (!n) return all;
       const starts = [], contains = [];
-      for (const e of entries) {
-        if (e.c === state.p || state.v.includes(e.c)) continue;
+      for (const e of all) {
         if (e.keys.some((k) => k.startsWith(n) || k.split(" ").some((w) => w.startsWith(n)))) starts.push(e);
         else if (e.keys.some((k) => k.includes(n))) contains.push(e);
       }
-      return starts.concat(contains).slice(0, 8);
+      return starts.concat(contains);
     }
-    function close() { listEl.hidden = true; input.setAttribute("aria-expanded", "false"); input.removeAttribute("aria-activedescendant"); }
-    function render() {
-      const q = input.value;
-      results = find(q);
-      if (!q.trim()) { close(); return; }
-      listEl.hidden = false;
-      input.setAttribute("aria-expanded", "true");
-      if (!results.length) {
-        listEl.innerHTML = `<li class="empty" role="option" aria-disabled="true">No country matches "${esc(q)}"</li>`;
-        input.removeAttribute("aria-activedescendant");
-        return;
-      }
-      active = Math.min(active, results.length - 1);
-      listEl.innerHTML = results.map((e, i) => {
-        const d = DOOR_BY_KEY[DOOR_OF[letter(state.p, e.c)]];
-        return `<li role="option" id="opt-${e.c}" data-code="${e.c}" aria-selected="${i === active}">${flag(e.c)}<span>${esc(e.name)}</span><span class="door"><span class="sw bg-${d.key}"></span> ${d.name} +${d.pts}</span></li>`;
+    function renderList() {
+      shown = filter(input.value);
+      if (!shown.length) { list.innerHTML = `<li class="empty" aria-disabled="true">No country matches "${esc(input.value)}"</li>`; return; }
+      list.innerHTML = shown.map((e, i) => {
+        const sel = opts.selected(e.c), dis = opts.disabled && opts.disabled(e.c);
+        const extra = opts.extra ? opts.extra(e.c) : "";
+        return `<li role="option" id="${id}-o-${e.c}" data-code="${e.c}" class="${multi ? "" : "single"}${i === active ? " active" : ""}" aria-selected="${sel}"${dis ? ' aria-disabled="true"' : ""}>${multi ? '<span class="cbx" aria-hidden="true"></span>' : ""}${flag(e.c)}<span class="nm">${esc(e.name)}</span>${extra}</li>`;
       }).join("");
-      input.setAttribute("aria-activedescendant", "opt-" + results[active].c);
+      updateFoot();
     }
-    function choose(code) { if (!code) return; toggleCountry(code); input.value = ""; active = 0; close(); input.focus(); }
-    input.addEventListener("input", () => { active = 0; render(); });
+    function updateFoot() {
+      let foot = panel.querySelector(".pick-foot");
+      if (!multi) return;
+      if (!foot) { foot = document.createElement("div"); foot.className = "pick-foot"; panel.appendChild(foot); }
+      const n = state.v.length;
+      foot.innerHTML = `<span class="muted">${plural(n, "country", "countries")} ticked</span><button type="button" class="btn" data-done>Done</button>`;
+    }
+    function setActive(i) {
+      active = Math.max(0, Math.min(i, shown.length - 1));
+      list.querySelectorAll("li").forEach((li, k) => li.classList.toggle("active", k === active));
+      const li = list.children[active];
+      if (li) { li.scrollIntoView({ block: "nearest" }); input.setAttribute("aria-activedescendant", li.id); }
+    }
+    function open() {
+      Object.values(pickers).forEach((p) => p !== api && p.close());
+      panel.hidden = false; btn.setAttribute("aria-expanded", "true");
+      input.value = ""; active = -1; renderList();
+      const cur = !multi && list.querySelector('[aria-selected="true"]');
+      if (cur) cur.scrollIntoView({ block: "center" });
+      input.focus();
+    }
+    function close() { if (panel.hidden) return; panel.hidden = true; btn.setAttribute("aria-expanded", "false"); input.removeAttribute("aria-activedescendant"); }
+    function choose(code) {
+      if (!code || (opts.disabled && opts.disabled(code))) return;
+      opts.onPick(code);
+      if (multi) { const top = list.scrollTop; renderList(); list.scrollTop = top; setActive(Math.max(active, 0)); }
+      else { close(); btn.focus(); }
+    }
+    btn.addEventListener("click", () => (panel.hidden ? open() : close()));
+    input.addEventListener("input", () => { active = -1; renderList(); if (shown.length) setActive(0); });
     input.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowDown") { e.preventDefault(); if (results.length) { active = (active + 1) % results.length; render(); } }
-      else if (e.key === "ArrowUp") { e.preventDefault(); if (results.length) { active = (active - 1 + results.length) % results.length; render(); } }
-      else if (e.key === "Enter") { e.preventDefault(); if (results[active]) choose(results[active].c); }
-      else if (e.key === "Escape") close();
+      if (e.key === "ArrowDown") { e.preventDefault(); setActive(active + 1); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); setActive(active - 1); }
+      else if (e.key === "Enter") { e.preventDefault(); if (shown[active]) choose(shown[active].c); else if (shown.length === 1) choose(shown[0].c); }
+      else if (e.key === "Escape") { close(); btn.focus(); }
     });
-    input.addEventListener("blur", () => setTimeout(close, 120));
-    listEl.addEventListener("mousedown", (e) => e.preventDefault());
-    listEl.addEventListener("click", (e) => { const li = e.target.closest("[data-code]"); if (li) choose(li.getAttribute("data-code")); });
+    list.addEventListener("mousedown", (e) => e.preventDefault());
+    list.addEventListener("click", (e) => { const li = e.target.closest("[data-code]"); if (li) { active = [...list.children].indexOf(li); choose(li.getAttribute("data-code")); } });
+    panel.addEventListener("click", (e) => { if (e.target.closest("[data-done]")) { close(); btn.focus(); } });
+    document.addEventListener("pointerdown", (e) => { if (!root.contains(e.target)) close(); });
+    const api = { open, close, refresh() { btn.querySelector(".pick-value").innerHTML = opts.button(); if (!panel.hidden) { const top = list.scrollTop; renderList(); list.scrollTop = top; } } };
+    pickers[id] = api;
+    return api;
+  }
+  function setupPickers() {
+    const collator = new Intl.Collator("en");
+    const passports = Object.keys(V.doors).sort((a, b) => collator.compare(nameOf[a], nameOf[b]));
+    const destinations = V.codes.slice().sort((a, b) => collator.compare(nameOf[a], nameOf[b]));
+    makePicker("passport-picker", {
+      codes: () => passports, selected: (c) => c === state.p, onPick: (c) => setPassport(c),
+      button: () => `${flag(state.p)}<span>${esc(nameOf[state.p])}</span>`,
+    });
+    makePicker("compare-picker", {
+      codes: () => passports.filter((c) => c !== state.p), selected: (c) => c === state.c, onPick: (c) => { state.c = c; renderAll(); },
+      button: () => `${flag(state.c)}<span>${esc(nameOf[state.c] || "")}</span>`,
+    });
+    makePicker("country-picker", {
+      codes: () => destinations, selected: (c) => state.v.includes(c), disabled: (c) => c === state.p, onPick: (c) => toggleCountry(c),
+      extra: (c) => {
+        if (c === state.p) return '<span class="door">Home</span>';
+        const d = DOOR_BY_KEY[DOOR_OF[letter(state.p, c)]];
+        return `<span class="door"><span class="sw bg-${d.key}"></span>${d.name} +${d.pts}</span>`;
+      },
+      button: () => state.v.length
+        ? `<span>${plural(state.v.length, "country", "countries")} ticked</span><span class="muted small">Open the list to add or remove</span>`
+        : `<span class="muted">Tick the countries you have visited</span>`,
+    });
   }
 
   /* ---------- Wiring ---------- */
   function wire() {
-    $("#passport").addEventListener("change", (e) => setPassport(e.target.value));
-    $("#compare-with").addEventListener("change", (e) => { state.c = e.target.value; renderAll(); });
     $("#picks").addEventListener("click", (e) => { const b = e.target.closest("[data-pick]"); if (b) { state.c = b.getAttribute("data-pick"); renderAll(); } });
     $("#popular").addEventListener("click", (e) => { const b = e.target.closest("[data-toggle]"); if (b) toggleCountry(b.getAttribute("data-toggle")); });
     $("#show-all").addEventListener("change", (e) => { state.showAll = e.target.checked; renderMap(); });
@@ -977,7 +1049,7 @@ footer { padding-block: 24px 36px; }
       $("#map-frame").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
     });
     $("#stamps").addEventListener("click", (e) => { const b = e.target.closest("[data-remove]"); if (b) toggleCountry(b.getAttribute("data-remove")); });
-    $("#start-own").addEventListener("click", () => { state.v = []; state.example = false; renderAll(); $("#passport").focus(); });
+    $("#start-own").addEventListener("click", () => { state.v = []; state.example = false; renderAll(); $("#passport-picker-btn").focus(); });
     let clearArmed = null;
     $("#clear-all").addEventListener("click", (e) => {
       const btn = e.currentTarget;
@@ -1032,13 +1104,6 @@ footer { padding-block: 24px 36px; }
     $("#data-henley").innerHTML = `<a href="https://www.henleyglobal.com/" target="_blank" rel="noopener">Henley Passport Index</a> by Henley &amp; Partners, based on IATA data, ${esc(HENLEY.edition)} edition. Henley counts ${HENLEY.destinations} destinations, including territories. This site counts ${V.codes.length - 1} countries, so the totals differ.`;
   }
 
-  function fillSelects() {
-    const collator = new Intl.Collator("en");
-    const list = Object.keys(V.doors).sort((a, b) => collator.compare(nameOf[a], nameOf[b]));
-    const opts = list.map((p) => `<option value="${p}">${esc(nameOf[p])}</option>`).join("");
-    $("#passport").innerHTML = opts;
-    $("#compare-with").innerHTML = opts;
-  }
 
   async function load() {
     paintToggle();
@@ -1051,7 +1116,7 @@ footer { padding-block: 24px 36px; }
     const power = (p) => (H[p] ? H[p][1] : reach[p]);
     const ranked = Object.keys(reach).sort((a, b) => power(b) - power(a) || nameOf[a].localeCompare(nameOf[b]));
     picks = { most: ranked[0], middle: ranked[Math.floor(ranked.length / 2)], least: ranked[ranked.length - 1], power };
-    fillSelects(); describeData(); restore(); buildMap(); setupSearch(); wire(); renderAll();
+    describeData(); restore(); buildMap(); setupPickers(); wire(); renderAll();
   }
 
   load().catch((err) => {
